@@ -1,0 +1,427 @@
+mixin: # object
+
+  dns:
+    enable: true
+    listen: 0.0.0.0:53
+    # These nameservers are used to resolve the DNS nameserver hostnames below.
+    # Specify IP addresses only
+    default-nameserver:
+      - 114.114.114.114
+      - 222.246.129.80
+      - 1.1.1.1
+      # - 8.8.8.8
+    enhanced-mode: fake-ip # or redir-host fake-ip
+    fake-ip-range: 198.18.0.1/16 # Fake IP addresses pool CIDR
+    # use-hosts: true # lookup hosts and return IP record
+    # hosts:
+    #   'lodev.morfans.cn': '::1'
+
+    # Hostnames in this list will not be resolved with fake IPs
+    # i.e. questions to these domain names will always be answered with their
+    # real IP addresses
+    fake-ip-filter:
+      # 以下域名列表参考自 vernesong/OpenClash 项目，并由 Hackl0us 整理补充
+      - '*.nb.gl'
+      - '*.morfans.cn'
+      - 'dns.rubyfish.cn'
+      # === LAN ===
+      - '*.lan'
+      # === Linksys Wireless Router ===
+      - '*.linksys.com'
+      - '*.linksyssmartwifi.com'
+      # === Apple Software Update Service ===
+      - 'swscan.apple.com'
+      - 'mesu.apple.com'
+      # === Windows 10 Connnect Detection ===
+      - '*.msftconnecttest.com'
+      - '*.msftncsi.com'
+      # === NTP Service ===
+      - 'time.*.com'
+      - 'time.*.gov'
+      - 'time.*.edu.cn'
+      - 'time.*.apple.com'
+
+      - 'time1.*.com'
+      - 'time2.*.com'
+      - 'time3.*.com'
+      - 'time4.*.com'
+      - 'time5.*.com'
+      - 'time6.*.com'
+      - 'time7.*.com'
+
+      - 'ntp.*.com'
+      - 'ntp.*.com'
+      - 'ntp1.*.com'
+      - 'ntp2.*.com'
+      - 'ntp3.*.com'
+      - 'ntp4.*.com'
+      - 'ntp5.*.com'
+      - 'ntp6.*.com'
+      - 'ntp7.*.com'
+
+      - '*.time.edu.cn'
+      - '*.ntp.org.cn'
+      - '+.pool.ntp.org'
+
+      - 'time1.cloud.tencent.com'
+      # === Music Service ===
+      ## NetEase
+      - '+.music.163.com'
+      - '*.126.net'
+      ## Baidu
+      - 'musicapi.taihe.com'
+      - 'music.taihe.com'
+      ## Kugou
+      - 'songsearch.kugou.com'
+      - 'trackercdn.kugou.com'
+      ## Kuwo
+      - '*.kuwo.cn'
+      ## JOOX
+      - 'api-jooxtt.sanook.com'
+      - 'api.joox.com'
+      - 'joox.com'
+      ## QQ
+      - '+.y.qq.com'
+      - '+.music.tc.qq.com'
+      - 'aqqmusic.tc.qq.com'
+      - '+.stream.qqmusic.qq.com'
+      ## Xiami
+      - '*.xiami.com'
+      ## Migu
+      - '+.music.migu.cn'
+      # === Game Service ===
+      ## Nintendo Switch
+      - '+.srv.nintendo.net'
+      ## Sony PlayStation
+      - '+.stun.playstation.net'
+      ## Microsoft Xbox
+      - 'xbox.*.microsoft.com'
+      - '+.xboxlive.com'
+      # === Other ===
+      ## QQ Quick Login
+      - 'localhost.ptlogin2.qq.com'
+      ## Golang
+      - 'proxy.golang.org'
+      ## STUN Server
+      - 'stun.*.*'
+      - 'stun.*.*.*'
+
+    # Supports UDP, TCP, DoT, DoH. You can specify the port to connect to.
+    # All DNS questions are sent directly to the nameserver, without proxies
+    # involved. Clash answers the DNS question with the first result gathered.
+    nameserver:
+      - https://doh.pub/dns-query
+      - https://doh.dns.sb/dns-query
+      - tls://dns.rubyfish.cn:853
+      - https://1.1.1.1/dns-query
+      # - https://rubyfish.cn/dns-query
+      # - 114.114.114.114
+      # - https://139.224.112.177/dns-query
+      # - 222.246.129.80
+      # - 59.51.78.210
+    # 之所以建议尽量不设置 fallback，因为使用 fallback 以后会 DNS 解析用时会大大延长，从而影响整体 HTTP 延时，严重影响上网体验。如果受 DNS 污染所迫被迫设置 fallback，请尽可能选择速度快的 DoT 作为 fallback。
+    fallback:
+      - 'tls://1.1.1.1:853'
+      # - tls://dns.rubyfish.cn:853
+      - https://dns.google/dns-query
+      # - https://dns.rubyfish.cn/dns-query
+      # - https://doh.xeton.dev/dns-query
+      # - 59.51.78.210
+      # - https://dns.wcc.best/dns-query
+    fallback-filter:
+      geoip: false
+      ipcidr:
+        - 240.0.0.0/4
+        - 0.0.0.0/32
+      # domain:
+      #   - '+.google.com'
+      #   - '+.facebook.com'
+      #   - '+.youtube.com'
+
+  tun:
+    enable: true
+    stack: gvisor # only gvisor
+    dns-hijack:
+      # - 222.246.129.80
+      - 198.18.0.2:53 # when `fake-ip-range` is 198.18.0.1/16, should hijack 198.18.0.2:53
+    macOS-auto-route: true # auto set global route for Windows
+    # It is recommended to use `interface-name`
+    macOS-auto-detect-interface: true # 自动检测出口网卡
+  # proxies:
+  # proxy-groups: 
+  #   - { name: "PROXY", type: select, proxies: [] }
+  #   - { name: "Google", type: select, proxies: [PROXY,] }
+  #   - { name: "Torrent", type: select, proxies: [RPOXY,Domestic,] }
+  #   - { name: "Youtube", type: select, proxies: [PROXY,] }
+  #   - { name: "Telegram", type: select, proxies: [PROXY,] }
+  #   - { name: "Opera", type: select, proxies: [PROXY,] }
+  #   - { name: "Firefox", type: select, proxies: [PROXY,] }
+  #   - { name: "AsianTV", type: select, proxies: [Domestic,PROXY,] }
+  #   - { name: "GlobalTV", type: select, proxies: [PROXY,] }
+  #   - { name: "Microsoft", type: select, proxies: [Domestic,AdBlock,PROXY,] }
+  #   - { name: "iCloud", type: select, proxies: [Domestic,AdBlock,PROXY,] }
+  #   - { name: "Apple", type: select, proxies: [Domestic,AdBlock,PROXY,] }
+  #   - { name: "Steam", type: select, proxies: [PROXY,] }
+  #   - { name: "AdBlock", type: select, proxies: [REJECT] }
+  #   - { name: "Domestic", type: select, proxies: [DIRECT] }
+  rule-providers:
+    Reject-Lorindabakken:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/reject.txt"
+      path: ./ruleset/reject-Lorindabakken.yaml
+      interval: 86400
+
+    Reject-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+      path: ./ruleset/reject-Loyalsoldier.yaml
+      interval: 86400
+
+    Reject-e7kmbb:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/github/e7kmbb.txt"
+      path: ./ruleset/Reject-e7kmbb.yaml
+      interval: 86400
+
+    Reject-jdlingyu:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/github/jdlingyu.txt"
+      path: ./ruleset/Reject-jdlingyu.yaml
+      interval: 86400
+
+    Reject-lhie7:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/github/lhie7.txt"
+      path: ./ruleset/Reject-lhie7.yaml
+      interval: 86400
+
+    Reject-neodevhost:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/github/neodevhost.txt"
+      path: ./ruleset/Reject-neodevhost.yaml
+      interval: 86400
+
+    Reject-xqin:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/github/xqin.txt"
+      path: ./ruleset/Reject-xqin.yaml
+      interval: 86400
+
+    Reject-keyword:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/reject/github/keyword.txt"
+      path: ./ruleset/Reject-keyword.yaml
+      interval: 86400
+
+    Torrent:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/proxy/torrent.txt"
+      path: ./ruleset/torrent.yaml
+      intervalL: 86400
+
+    google-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
+      path: ./ruleset/google-Loyalsoldier.yaml
+      interval: 86400
+
+    opera:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/proxy/opera.txt"
+      path: ./ruleset/opera.yaml
+      interval: 86400
+
+    firefox:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/proxy/firefox.txt"
+      path: ./ruleset/firefox.yaml
+      interval: 86400
+
+    fuckip:
+      type: http
+      behavior: ipcidr
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/proxy/fuckip.txt"
+      path: ./ruleset/fuckip.yaml
+      interval: 86400
+
+    icloud-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+      path: ./ruleset/icloud-Loyalsoldier.yaml
+      interval: 86400
+
+    AsianTV:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/rule-set/asian-tv.yaml"
+      path: ./ruleset/AsianTV.yaml
+      interval: 86400
+
+    GlobalTV:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/rule-set/global-tv.yaml"
+      path: ./ruleset/GlobalTV.yaml
+      interval: 86400
+
+    Microsoft:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/rule-set/microsoft.yaml"
+      path: ./ruleset/Microsoft.yaml
+      interval: 86400
+
+    Steam:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/rule-set/steam.yaml"
+      path: ./ruleset/Steam.yaml
+      interval: 86400
+
+    Telegram:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/rule-set/telegram.yaml"
+      path: ./ruleset/Telegram.yaml
+      interval: 86400
+
+    telegramcidr-Loyalsoldier:
+      type: http
+      behavior: ipcidr
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+      path: ./ruleset/telegramcidr-Loyalsoldier.yaml
+      interval: 86400
+
+    Youtube:
+      type: http
+      behavior: classical
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/rule-set/youtube.yaml"
+      path: ./ruleset/Youtube.yaml
+      interval: 86400
+
+    apple-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+      path: ./ruleset/apple-Loyalsoldier.yaml
+      interval: 86400
+
+    proxy-lorindabakken:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/lorindabakken/FUCK-INTERNET@master/provider/proxy/proxy.txt"
+      path: ./ruleset/proxy-lorindabakken.yaml
+      interval: 86400
+
+    gfw-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+      path: ./ruleset/gfw-Loyalsoldier.yaml
+      interval: 86400
+
+    greatfire-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt"
+      path: ./ruleset/greatfire-Loyalsoldier.yaml
+      interval: 86400
+
+    tld-not-cn-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
+      path: ./ruleset/tld-not-cn-Loyalsoldier.yaml
+      interval: 86400
+
+    direct-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+      path: ./ruleset/direct-Loyalsoldier.yaml
+      interval: 86400
+
+    cncidr:
+      type: http
+      behavior: ipcidr
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+      path: ./ruleset/cncidr-Loyalsoldier.yaml
+      interval: 86400
+
+    lancidr:
+      type: http
+      behavior: ipcidr
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+      path: ./ruleset/lancidr-Loyalsoldier.yaml
+      interval: 86400
+
+    proxy-Loyalsoldier:
+      type: http
+      behavior: domain
+      url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+      path: ./ruleset/proxy-Loyalsoldier.yaml
+      interval: 86400
+  rules:
+    - PROCESS-NAME,v2ray,🎯 全球直连
+    # - PROCESS-NAME,Surge%203,🎯 全球直连
+    - PROCESS-NAME,ss-local,🎯 全球直连
+    - PROCESS-NAME,privoxy,🎯 全球直连
+    - PROCESS-NAME,trojan,🎯 全球直连
+    - PROCESS-NAME,trojan-go,🎯 全球直连
+    - PROCESS-NAME,naive,🎯 全球直连
+    # - PROCESS-NAME,Thunder,🎯 全球直连
+    - PROCESS-NAME,DownloadService,🎯 全球直连
+    # - PROCESS-NAME,qBittorrent,🎯 全球直连
+    - PROCESS-NAME,Transmission,🎯 全球直连
+    - PROCESS-NAME,fdm,🎯 全球直连
+    - PROCESS-NAME,aria2c,🎯 全球直连
+    # - PROCESS-NAME,Folx,🎯 全球直连
+    - PROCESS-NAME,NetTransport,🎯 全球直连
+    # - PROCESS-NAME,uTorrent,Torrent
+    # - PROCESS-NAME,WebTorrent,Torrent
+    # - DOMAIN,clash.razord.top,🎯 全球直连
+    # - DOMAIN,yacd.haishan.me,🎯 全球直连
+    - RULE-SET,Reject-Lorindabakken,🛑 全球拦截
+    - RULE-SET,Reject-Loyalsoldier,🛑 全球拦截
+    - RULE-SET,Reject-e7kmbb,🛑 全球拦截
+    - RULE-SET,Reject-jdlingyu,🛑 全球拦截
+    - RULE-SET,Reject-lhie7,🛑 全球拦截
+    - RULE-SET,Reject-neodevhost,🛑 全球拦截
+    # - RULE-SET,Reject-xqin,🛑 全球拦截
+    - RULE-SET,Reject-keyword,🛑 全球拦截
+    # - RULE-SET,Torrent,Torrent
+    # - RULE-SET,google-Loyalsoldier,Google
+    # - RULE-SET,opera,Opera
+    # - RULE-SET,firefox,Firefox
+    - RULE-SET,fuckip,🔰 节点选择
+    - RULE-SET,proxy-lorindabakken,🔰 节点选择
+    # - RULE-SET,AsianTV,AsianTV
+    # - RULE-SET,GlobalTV,GlobalTV
+    - RULE-SET,Microsoft,Ⓜ️ 微软服务
+    # - RULE-SET,Steam,Steam
+    # - RULE-SET,Youtube,Youtube
+    - RULE-SET,Telegram,📲 电报信息
+    - RULE-SET,apple-Loyalsoldier,🍎 苹果服务
+    - RULE-SET,tld-not-cn-Loyalsoldier,🔰 节点选择
+    - RULE-SET,gfw-Loyalsoldier,🔰 节点选择
+    - RULE-SET,greatfire-Loyalsoldier,🔰 节点选择
+    - RULE-SET,telegramcidr-Loyalsoldier,📲 电报信息
+    - RULE-SET,proxy-Loyalsoldier,🔰 节点选择
+    - RULE-SET,direct-Loyalsoldier,🎯 全球直连
+    - RULE-SET,cncidr,🎯 全球直连,no-resolve
+    - RULE-SET,lancidr,🎯 全球直连,no-resolve
+    - GEOIP,CN,🎯 全球直连,no-resolve
+    - MATCH,🐟 漏网之鱼
